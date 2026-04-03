@@ -2,24 +2,60 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: python-app
+  labels:
+    app: python-app
+
 spec:
   replicas: 2
+  revisionHistoryLimit: 5
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
   selector:
     matchLabels:
       app: python-app
+
   template:
     metadata:
       labels:
         app: python-app
+
     spec:
       containers:
         - name: python-app
-          image: YOUR_DOCKERHUB/python-app:latest
+          image: rethanya/python-cicd-app:{{TAG}}
+          imagePullPolicy: Always
+
           ports:
-            - containerPort: 5000
+            - containerPort: 5001
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
           livenessProbe:
             httpGet:
               path: /health
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 5
+              port: 5001
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 5
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
