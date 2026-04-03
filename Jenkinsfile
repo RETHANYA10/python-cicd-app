@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "python-cicd-app"
-        DOCKERHUB_REPO = "YOUR_DOCKERHUB_USERNAME/python-cicd-app"
+        DOCKERHUB_REPO = "rethanya/python-cicd-app"
     }
 
     stages {
