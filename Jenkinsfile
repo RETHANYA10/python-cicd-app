@@ -46,8 +46,11 @@ pipeline {
     }
 
     post {
-        failure {
-            sh "kubectl rollout undo deployment/python-cicd-app"
-        }
+    failure {
+        echo "Deployment failed – rolling back python-app"
+        sh """
+          kubectl rollout undo deployment/python-app
+          kubectl rollout status deployment/python-app
+        """
     }
 }
